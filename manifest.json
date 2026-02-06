@@ -1,0 +1,8 @@
+{
+    "name": "Command Button",
+    "display_name": "명령어 버튼 확장",
+    "version": "1.0.0",
+    "description": "/cut, /hide 등을 버튼으로 만들어줍니다.",
+    "js": "index.js",
+    "css": "style.css"
+}
