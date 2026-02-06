@@ -1,0 +1,15 @@
+.custom-cmd-btn {
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--mainColor);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+.custom-cmd-btn:hover {
+    background-color: var(--mainColor);
+    color: white;
+}
