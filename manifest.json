@@ -1,8 +1,8 @@
 {
-    "name": "Command Button",
+    "name": "command-buttons",
     "display_name": "명령어 버튼 확장",
     "version": "1.0.0",
-    "description": "/cut, /hide 등을 버튼으로 만들어줍니다.",
-    "js": "index.js",
-    "css": "style.css"
+    "description": "/cut, /hide, /chat-jump를 버튼으로 실행합니다.",
+    "author": "ls2ver",
+    "entrypoint": "index.js"
 }
