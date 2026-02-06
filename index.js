@@ -1,43 +1,57 @@
 import { executeSlashCommands } from "../../../slash-commands.js";
 import { callGenericPopup, POPUP_TYPE } from "../../../popup.js";
+import { event_types, eventSource } from "../../../script.js";
 
-function addButtons() {
-    // 이미 버튼이 있다면 중복 생성 방지
-    if (document.getElementById('quick-cmd-wrapper')) return;
+const EXTENSION_NAME = "Command-button";
 
-    // 채팅 입력창 근처(상단 툴바)에 강제 삽입
-    const target = document.querySelector('.extension_container') || document.getElementById('extensions_settings');
-    
-    if (!target) return;
+// 메시지 메뉴가 열릴 때 실행되는 함수
+function addButtonsToMessageMenu(messageId) {
+    const menu = document.getElementById('message_menu');
+    if (!menu) return;
 
-    const wrapper = document.createElement('div');
-    wrapper.id = 'quick-cmd-wrapper';
-    wrapper.innerHTML = `<div style="color:var(--mainColor); font-weight:bold; margin: 10px 0 5px 5px;">⚡ 빠른 명령어</div>`;
-    wrapper.style.padding = '10px';
+    // 이미 버튼이 있으면 중복 추가 방지
+    if (menu.querySelector('.custom-cmd-separator')) return;
 
+    // 구분선 추가
+    const separator = document.createElement('div');
+    separator.className = 'custom-cmd-separator';
+    separator.style.borderTop = '1px solid rgba(128,128,128,0.3)';
+    separator.style.margin = '5px 0';
+    menu.appendChild(separator);
+
+    // 버튼 목록
     const buttons = [
-        { label: '✂️ Cut', cmd: '/cut', prompt: '삭제 범위 (예: 1-5)' },
-        { label: '👁️ Hide', cmd: '/hide', prompt: '숨길 번호' },
-        { label: '🚀 Jump', cmd: '/chat-jump', prompt: '이동할 번호' }
+        { label: '✂️ Cut (삭제)', cmd: '/cut', hint: '10-20' },
+        { label: '👁️ Hide (숨김)', cmd: '/hide', hint: '숨길 번호' },
+        { label: '🚀 Jump (이동)', cmd: '/chat-jump', hint: '이동할 번호' }
     ];
 
     buttons.forEach(btn => {
-        const button = document.createElement('div');
-        button.className = 'menu_button custom-cmd-btn';
-        button.style.display = 'inline-block';
-        button.style.margin = '2px';
-        button.innerText = btn.label;
-        button.onclick = async () => {
-            const input = await callGenericPopup(btn.prompt, POPUP_TYPE.TEXT);
+        const item = document.createElement('div');
+        // 실리태번 메뉴 스타일 적용
+        item.className = 'list-group-item'; 
+        item.innerHTML = `<span>${btn.label}</span>`;
+        item.style.cursor = 'pointer';
+        item.style.padding = '5px 10px';
+        
+        item.onclick = async () => {
+            menu.style.display = 'none'; // 메뉴 닫기
+            const input = await callGenericPopup(
+                `[${btn.label}]\n범위를 입력하세요 (ID: ${messageId})`,
+                POPUP_TYPE.TEXT
+            );
             if (input) {
                 await executeSlashCommands(`${btn.cmd} ${input}`);
             }
         };
-        wrapper.appendChild(button);
+        menu.appendChild(item);
     });
-
-    target.prepend(wrapper); // 메뉴 최상단에 붙이기
 }
 
-// 실리태번이 완전히 로드된 후 실행되도록 지연 실행
-setTimeout(addButtons, 1000);
+jQuery(document).ready(function () {
+    console.log(`${EXTENSION_NAME} 준비 완료!`);
+    // 메시지 메뉴가 열리는 이벤트를 감지
+    eventSource.on(event_types.MESSAGE_OPTS_SHOWN, (messageId) => {
+        addButtonsToMessageMenu(messageId);
+    });
+});
