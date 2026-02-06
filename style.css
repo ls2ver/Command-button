@@ -1,14 +1,10 @@
-#my_quick_cmd_btn {
-    transition: all 0.2s;
-    opacity: 0.7;
+#my_cmd_btn {
+    flex-shrink: 0 !important; /* 공간 부족해도 줄어들지 마라 */
+    min-width: 40px !important;
+    background-color: transparent;
+    transition: 0.2s;
 }
-#my_quick_cmd_btn:hover {
-    opacity: 1;
-    background-color: var(--white-30);
-}
-/* 모바일 화면 대응 */
-@media screen and (max-width: 500px) {
-    #my_quick_cmd_btn {
-        padding: 0 10px; 
-    }
+#my_cmd_btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
 }
