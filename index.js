@@ -1,27 +1,31 @@
 import { executeSlashCommands } from "../../../slash-commands.js";
 import { callGenericPopup, POPUP_TYPE } from "../../../popup.js";
 
-// 버튼을 추가할 컨테이너를 찾거나 생성하는 함수
 function addButtons() {
-    // 채팅 입력창 상단 툴바에 추가
-    const container = document.getElementById('extensions_settings');
+    // 이미 버튼이 있다면 중복 생성 방지
+    if (document.getElementById('quick-cmd-wrapper')) return;
+
+    // 채팅 입력창 근처(상단 툴바)에 강제 삽입
+    const target = document.querySelector('.extension_container') || document.getElementById('extensions_settings');
     
+    if (!target) return;
+
     const wrapper = document.createElement('div');
     wrapper.id = 'quick-cmd-wrapper';
-    wrapper.style.display = 'flex';
-    wrapper.style.gap = '5px';
-    wrapper.style.margin = '5px';
+    wrapper.innerHTML = `<div style="color:var(--mainColor); font-weight:bold; margin: 10px 0 5px 5px;">⚡ 빠른 명령어</div>`;
+    wrapper.style.padding = '10px';
 
-    // 버튼 설정 정보
     const buttons = [
-        { label: '✂️ Cut', cmd: '/cut', prompt: '삭제할 범위를 입력하세요 (예: 1-5)' },
-        { label: '👁️ Hide', cmd: '/hide', prompt: '숨길 메시지 번호를 입력하세요' },
-        { label: '🚀 Jump', cmd: '/chat-jump', prompt: '이동할 메시지 번호를 입력하세요' }
+        { label: '✂️ Cut', cmd: '/cut', prompt: '삭제 범위 (예: 1-5)' },
+        { label: '👁️ Hide', cmd: '/hide', prompt: '숨길 번호' },
+        { label: '🚀 Jump', cmd: '/chat-jump', prompt: '이동할 번호' }
     ];
 
     buttons.forEach(btn => {
         const button = document.createElement('div');
         button.className = 'menu_button custom-cmd-btn';
+        button.style.display = 'inline-block';
+        button.style.margin = '2px';
         button.innerText = btn.label;
         button.onclick = async () => {
             const input = await callGenericPopup(btn.prompt, POPUP_TYPE.TEXT);
@@ -32,12 +36,8 @@ function addButtons() {
         wrapper.appendChild(button);
     });
 
-    // 실리태번 왼쪽 하단 확장 설정 영역에 추가
-    container.appendChild(wrapper);
+    target.prepend(wrapper); // 메뉴 최상단에 붙이기
 }
 
-// 확장팩 로드 시 실행
-(function() {
-    console.log("Quick Command Buttons Extension Loaded");
-    addButtons();
-})();
+// 실리태번이 완전히 로드된 후 실행되도록 지연 실행
+setTimeout(addButtons, 1000);
