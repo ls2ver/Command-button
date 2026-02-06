@@ -1,8 +1,9 @@
 {
-    "name": "command-buttons",
-    "display_name": "명령어 버튼 확장",
-    "version": "1.0.0",
-    "description": "/cut, /hide, /chat-jump를 버튼으로 실행합니다.",
-    "author": "ls2ver",
-    "entrypoint": "index.js"
+    "name": "quick-command-buttons",
+    "display_name": "⚡ 퀵 커맨드 버튼",
+    "version": "2.0.0",
+    "description": "버전 2.0 업데이트",
+    "author": "Me",
+    "js": "index.js",
+    "css": "style.css"
 }
