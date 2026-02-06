@@ -1,15 +1,14 @@
-.custom-cmd-btn {
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--mainColor);
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: 0.2s;
-    display: inline-block;
+#my_quick_cmd_btn {
+    transition: all 0.2s;
+    opacity: 0.7;
 }
-
-.custom-cmd-btn:hover {
-    background-color: var(--mainColor);
-    color: white;
+#my_quick_cmd_btn:hover {
+    opacity: 1;
+    background-color: var(--white-30);
+}
+/* 모바일 화면 대응 */
+@media screen and (max-width: 500px) {
+    #my_quick_cmd_btn {
+        padding: 0 10px; 
+    }
 }
