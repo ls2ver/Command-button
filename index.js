@@ -1,57 +1,48 @@
 import { executeSlashCommands } from "../../../slash-commands.js";
 import { callGenericPopup, POPUP_TYPE } from "../../../popup.js";
-import { event_types, eventSource } from "../../../script.js";
 
 const EXTENSION_NAME = "Command-button";
 
-// 메시지 메뉴가 열릴 때 실행되는 함수
-function addButtonsToMessageMenu(messageId) {
-    const menu = document.getElementById('message_menu');
-    if (!menu) return;
+// 1. 실제 명령어를 실행하는 로직
+async function runCommand(cmd, label, hint) {
+    // 범위를 입력받는 팝업 띄우기
+    const input = await callGenericPopup(
+        `<h3>${label}</h3>범위나 숫자를 입력하세요.<br><small style="color:gray">(예: ${hint})</small>`,
+        POPUP_TYPE.TEXT
+    );
 
-    // 이미 버튼이 있으면 중복 추가 방지
-    if (menu.querySelector('.custom-cmd-separator')) return;
-
-    // 구분선 추가
-    const separator = document.createElement('div');
-    separator.className = 'custom-cmd-separator';
-    separator.style.borderTop = '1px solid rgba(128,128,128,0.3)';
-    separator.style.margin = '5px 0';
-    menu.appendChild(separator);
-
-    // 버튼 목록
-    const buttons = [
-        { label: '✂️ Cut (삭제)', cmd: '/cut', hint: '10-20' },
-        { label: '👁️ Hide (숨김)', cmd: '/hide', hint: '숨길 번호' },
-        { label: '🚀 Jump (이동)', cmd: '/chat-jump', hint: '이동할 번호' }
-    ];
-
-    buttons.forEach(btn => {
-        const item = document.createElement('div');
-        // 실리태번 메뉴 스타일 적용
-        item.className = 'list-group-item'; 
-        item.innerHTML = `<span>${btn.label}</span>`;
-        item.style.cursor = 'pointer';
-        item.style.padding = '5px 10px';
-        
-        item.onclick = async () => {
-            menu.style.display = 'none'; // 메뉴 닫기
-            const input = await callGenericPopup(
-                `[${btn.label}]\n범위를 입력하세요 (ID: ${messageId})`,
-                POPUP_TYPE.TEXT
-            );
-            if (input) {
-                await executeSlashCommands(`${btn.cmd} ${input}`);
-            }
-        };
-        menu.appendChild(item);
-    });
+    if (input) {
+        await executeSlashCommands(`${cmd} ${input}`);
+    }
 }
 
-jQuery(document).ready(function () {
-    console.log(`${EXTENSION_NAME} 준비 완료!`);
-    // 메시지 메뉴가 열리는 이벤트를 감지
-    eventSource.on(event_types.MESSAGE_OPTS_SHOWN, (messageId) => {
-        addButtonsToMessageMenu(messageId);
-    });
-});
+// 2. 버튼 눌렀을 때 뜨는 메뉴 (선택창)
+async function showCommandMenu() {
+    // 메뉴 디자인 (HTML)
+    const menuHtml = `
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div id="btn_cut" class="menu_button" style="padding: 10px; cursor: pointer;">
+                ✂️ <b>Cut (삭제)</b>
+            </div>
+            <div id="btn_hide" class="menu_button" style="padding: 10px; cursor: pointer;">
+                👁️ <b>Hide (숨김)</b>
+            </div>
+            <div id="btn_jump" class="menu_button" style="padding: 10px; cursor: pointer;">
+                🚀 <b>Jump (이동)</b>
+            </div>
+        </div>
+    `;
+
+    // 팝업 띄우기 (내용만 보여줌)
+    callGenericPopup(menuHtml, POPUP_TYPE.TEXT, '', { okButton: '닫기' });
+
+    // 팝업이 뜨고 난 뒤 클릭 이벤트 연결 (0.1초 딜레이)
+    setTimeout(() => {
+        // Cut 버튼
+        document.getElementById('btn_cut')?.addEventListener('click', () => {
+            // 현재 팝업 닫고 실행 팝업 띄우기 (약간의 트릭)
+            document.querySelector('.swal2-confirm')?.click(); 
+            setTimeout(() => runCommand('/cut', '✂️ Cut (삭제)', '10-20'), 300);
+        });
+
+        // Hide
